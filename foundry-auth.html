@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Foundry — Sign In or Create Account</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+:root{--font:"DM Sans",-apple-system,sans-serif;--bg:#FFFFFF;--bg-alt:#F8F9FA;--bg-ter:#F1F3F4;--blue:#1A73E8;--blue-hov:#1557B0;--blue-tint:#E8F0FE;--t-primary:#202124;--t-body:#3C4043;--t-muted:#5F6368;--t-faint:#80868B;--t-ghost:#BDC1C6;--border:#DADCE0;--border-md:#E8EAED;--green:#137333;--green-bg:#E6F4EA;--red:#C5221F;--red-bg:#FCE8E6;--sh-sm:0 1px 4px rgba(0,0,0,0.06);--sh-md:0 4px 16px rgba(0,0,0,0.10);--tr:200ms ease;--r-md:6px;--r-lg:12px;--r-pill:100px;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px}
+body{font-family:var(--font);background:var(--bg-alt);color:var(--t-body);-webkit-font-smoothing:antialiased;min-height:100vh;display:flex;flex-direction:column}
+a{color:var(--blue);text-decoration:none}
+/* layout */
+.auth-shell{flex:1;display:grid;grid-template-columns:1fr 1fr;min-height:100vh}
+.auth-left{background:var(--blue-dark);display:flex;flex-direction:column;justify-content:space-between;padding:48px;position:relative;overflow:hidden}
+.auth-left::before{content:'';position:absolute;top:-80px;right:-80px;width:400px;height:400px;border:1px solid rgba(255,255,255,0.06);border-radius:50%}
+.auth-left::after{content:'';position:absolute;bottom:-120px;left:-60px;width:320px;height:320px;border:1px solid rgba(255,255,255,0.04);border-radius:50%}
+.al-logo{font-size:18px;font-weight:700;color:#fff;letter-spacing:-0.03em;position:relative;z-index:2}
+.al-logo sup{font-size:9px;color:#8AB4F8;font-weight:600;vertical-align:super}
+.al-body{position:relative;z-index:2}
+.al-headline{font-size:32px;font-weight:400;color:#fff;line-height:1.25;margin-bottom:16px;letter-spacing:-0.01em}
+.al-sub{font-size:15px;color:rgba(255,255,255,0.55);line-height:1.65;margin-bottom:32px}
+.al-stats{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.al-stat{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:var(--r-lg);padding:16px}
+.al-stat-num{font-size:22px;font-weight:600;color:#fff;margin-bottom:4px}
+.al-stat-lbl{font-size:12px;color:rgba(255,255,255,0.45)}
+.al-quote{position:relative;z-index:2;padding-top:32px;border-top:1px solid rgba(255,255,255,0.1)}
+.al-quote-text{font-size:14px;color:rgba(255,255,255,0.6);line-height:1.65;font-style:italic;margin-bottom:12px}
+.al-quote-author{font-size:12px;color:rgba(255,255,255,0.35)}
+/* right panel */
+.auth-right{display:flex;align-items:center;justify-content:center;padding:48px 32px}
+.auth-box{width:100%;max-width:400px}
+.auth-top-link{font-size:13px;color:var(--t-muted);margin-bottom:32px;display:block;text-align:right}
+.auth-top-link a{color:var(--blue);font-weight:500}
+/* screens */
+.screen{display:none}
+.screen.active{display:block;animation:fadeUp 0.25s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.auth-title{font-size:26px;font-weight:500;color:var(--t-primary);margin-bottom:8px;letter-spacing:-0.01em}
+.auth-sub{font-size:14px;color:var(--t-muted);line-height:1.6;margin-bottom:32px}
+/* role picker */
+.role-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
+.role-card{border:1.5px solid var(--border);border-radius:var(--r-lg);padding:20px 16px;cursor:pointer;transition:all var(--tr);text-align:center;background:var(--bg)}
+.role-card:hover{border-color:var(--blue);background:var(--blue-tint)}
+.role-card.selected{border-color:var(--blue);background:var(--blue-tint)}
+.role-card-icon{font-size:24px;margin-bottom:10px;display:block}
+.role-card-title{font-size:14px;font-weight:500;color:var(--t-primary);margin-bottom:4px}
+.role-card-desc{font-size:12px;color:var(--t-muted)}
+/* form fields */
+.field{margin-bottom:18px}
+.ds-label{display:block;font-size:13px;font-weight:500;color:var(--t-muted);margin-bottom:6px}
+.ds-input{height:44px;width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-md);padding:0 14px;font-family:var(--font);font-size:14px;color:var(--t-primary);outline:none;transition:border-color var(--tr),box-shadow var(--tr)}
+.ds-input::placeholder{color:var(--t-ghost)}
+.ds-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,115,232,0.15)}
+.pw-wrap{position:relative}
+.pw-wrap .ds-input{padding-right:44px}
+.pw-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:14px;color:var(--t-muted)}
+/* password strength */
+.pw-strength{margin-top:8px;display:flex;gap:4px}
+.pw-bar{height:3px;flex:1;border-radius:2px;background:var(--border)}
+.pw-bar.weak{background:var(--red)}
+.pw-bar.ok{background:var(--amber,#B45309)}
+.pw-bar.strong{background:var(--green)}
+.pw-label{font-size:11px;color:var(--t-muted);margin-top:4px}
+/* portal chooser */
+.portal-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:24px}
+.portal-card{border:1.5px solid var(--border);border-radius:var(--r-lg);padding:24px 20px;cursor:pointer;transition:all var(--tr);text-decoration:none;display:block;background:var(--bg)}
+.portal-card:hover{border-color:var(--blue);background:var(--blue-tint);box-shadow:var(--sh-md)}
+.portal-card-icon{font-size:28px;margin-bottom:12px;display:block}
+.portal-card-title{font-size:16px;font-weight:500;color:var(--t-primary);margin-bottom:6px}
+.portal-card-desc{font-size:13px;color:var(--t-muted);line-height:1.5}
+/* success */
+.success-icon{width:64px;height:64px;background:var(--green-bg);border:2px solid rgba(19,115,51,0.25);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 20px;animation:popIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both}
+@keyframes popIn{from{transform:scale(0.5);opacity:0}to{transform:scale(1);opacity:1}}
+/* divider */
+.or-divider{display:flex;align-items:center;gap:12px;margin:20px 0;font-size:13px;color:var(--t-faint)}
+.or-line{flex:1;height:1px;background:var(--border)}
+/* step indicator */
+.step-dots{display:flex;gap:6px;margin-bottom:24px}
+.step-dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:all 0.2s}
+.step-dot.done{background:var(--green)}
+.step-dot.active{background:var(--blue);width:20px;border-radius:4px}
+/* btn */
+.btn-primary{display:flex;align-items:center;justify-content:center;width:100%;padding:13px;background:var(--blue);color:#fff;border:none;border-radius:var(--r-md);font-family:var(--font);font-size:15px;font-weight:500;cursor:pointer;transition:background var(--tr),box-shadow var(--tr);margin-top:8px}
+.btn-primary:hover{background:var(--blue-hov);box-shadow:0 2px 8px rgba(26,115,232,0.35)}
+.btn-primary:disabled{background:var(--border);color:var(--t-ghost);cursor:default;box-shadow:none}
+.btn-secondary{display:flex;align-items:center;justify-content:center;width:100%;padding:12px;background:transparent;color:var(--blue);border:1.5px solid var(--border);border-radius:var(--r-md);font-family:var(--font);font-size:14px;font-weight:500;cursor:pointer;transition:all var(--tr);margin-top:8px}
+.btn-secondary:hover{background:var(--bg-alt);border-color:var(--blue)}
+.fine{font-size:12px;color:var(--t-faint);text-align:center;margin-top:16px;line-height:1.55}
+.fine a{color:var(--blue)}
+.link-btn{background:none;border:none;color:var(--blue);font-family:var(--font);font-size:13px;cursor:pointer;font-weight:500}
+.link-btn:hover{text-decoration:underline}
+@media(max-width:780px){.auth-shell{grid-template-columns:1fr}.auth-left{display:none}.auth-right{padding:32px 20px;align-items:flex-start}}
+</style>
+</head>
+<body>
+<div class="auth-shell">
+  <!-- LEFT PANEL -->
+  <div class="auth-left">
+    <div class="al-logo">Foundry<sup>IN</sup></div>
+    <div class="al-body">
+      <div id="al-headline" class="al-headline">India's startup talent platform.</div>
+      <p id="al-sub" class="al-sub">AI-matched roles at India's best startups. Salary and equity upfront. Free forever for talent.</p>
+      <div class="al-stats">
+        <div class="al-stat"><div class="al-stat-num">500k+</div><div class="al-stat-lbl">Talent profiles</div></div>
+        <div class="al-stat"><div class="al-stat-num">3,200+</div><div class="al-stat-lbl">Live roles</div></div>
+        <div class="al-stat"><div class="al-stat-num">1,800+</div><div class="al-stat-lbl">Verified startups</div></div>
+        <div class="al-stat"><div class="al-stat-num">94%</div><div class="al-stat-lbl">AI match accuracy</div></div>
+      </div>
+    </div>
+    <div class="al-quote">
+      <p id="al-quote-text" class="al-quote-text">"I found my PM role at a Series B startup within 3 weeks of creating my profile. The AI match score told me exactly why I was right for it."</p>
+      <div class="al-quote-author" id="al-quote-author">Riya Menon · Senior PM, Kirana Club</div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="auth-right">
+    <div class="auth-box">
+
+      <!-- SCREEN 1: ROLE SELECT -->
+      <div class="screen active" id="s-role">
+        <div class="auth-top-link">Already have an account? <a href="#" onclick="showLogin()">Sign in</a></div>
+        <h1 class="auth-title">Create your account</h1>
+        <p class="auth-sub">Are you looking for a role, or are you hiring?</p>
+        <div class="role-cards">
+          <div class="role-card" id="rc-talent" onclick="selectRole('talent')">
+            <span class="role-card-icon">🚀</span>
+            <div class="role-card-title">I'm looking for a role</div>
+            <div class="role-card-desc">Browse startup jobs, get AI-matched</div>
+          </div>
+          <div class="role-card" id="rc-startup" onclick="selectRole('startup')">
+            <span class="role-card-icon">🏗️</span>
+            <div class="role-card-title">I'm hiring</div>
+            <div class="role-card-desc">Post roles, find vetted talent</div>
+          </div>
+        </div>
+        <div class="field"><label class="ds-label">Work email</label><input class="ds-input" type="email" id="email-1" placeholder="you@company.com" oninput="checkStep1()"></div>
+        <button class="btn-primary" id="btn-step1" disabled onclick="goStep2()">Continue →</button>
+        <p class="fine">By continuing you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.</p>
+      </div>
+
+      <!-- SCREEN 2: NAME + PASSWORD -->
+      <div class="screen" id="s-details">
+        <div class="step-dots">
+          <div class="step-dot done"></div>
+          <div class="step-dot active"></div>
+          <div class="step-dot"></div>
+        </div>
+        <h1 class="auth-title">Set up your account</h1>
+        <p class="auth-sub" id="s2-sub">Tell us your name and choose a password.</p>
+        <div class="field"><label class="ds-label">First name</label><input class="ds-input" type="text" placeholder="Riya"></div>
+        <div class="field"><label class="ds-label">Last name</label><input class="ds-input" type="text" placeholder="Menon"></div>
+        <div class="field" id="company-field" style="display:none"><label class="ds-label">Company name</label><input class="ds-input" type="text" placeholder="Kirana Club"></div>
+        <div class="field">
+          <label class="ds-label">Password</label>
+          <div class="pw-wrap"><input class="ds-input" type="password" id="pw-input" placeholder="At least 8 characters" oninput="checkPW(this.value)"><button class="pw-toggle" type="button" onclick="togglePW()">👁</button></div>
+          <div class="pw-strength"><div class="pw-bar" id="pb1"></div><div class="pw-bar" id="pb2"></div><div class="pw-bar" id="pb3"></div><div class="pw-bar" id="pb4"></div></div>
+          <div class="pw-label" id="pw-label">Enter a password</div>
+        </div>
+        <button class="btn-primary" onclick="goSuccess()">Create account →</button>
+        <button class="btn-secondary" onclick="show('s-role')">← Back</button>
+      </div>
+
+      <!-- SCREEN 3: SUCCESS -->
+      <div class="screen" id="s-success">
+        <div class="step-dots">
+          <div class="step-dot done"></div>
+          <div class="step-dot done"></div>
+          <div class="step-dot active"></div>
+        </div>
+        <div class="success-icon">✓</div>
+        <h1 class="auth-title" style="text-align:center" id="success-title">Account created!</h1>
+        <p class="auth-sub" style="text-align:center" id="success-sub">Your profile is ready. Let's set it up so startups can find you.</p>
+        <a href="foundry-profile-setup.html" class="btn-primary" id="success-cta" style="text-decoration:none">Set up my profile →</a>
+      </div>
+
+      <!-- SCREEN: LOGIN -->
+      <div class="screen" id="s-login">
+        <div class="auth-top-link">New to Foundry? <a href="#" onclick="show('s-role')">Create account</a></div>
+        <h1 class="auth-title">Welcome back</h1>
+        <p class="auth-sub">Sign in to your Foundry account.</p>
+        <div class="field"><label class="ds-label">Email</label><input class="ds-input" type="email" id="login-email" placeholder="you@company.com"></div>
+        <div class="field">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><label class="ds-label" style="margin:0">Password</label><button class="link-btn" onclick="showForgot()">Forgot password?</button></div>
+          <div class="pw-wrap"><input class="ds-input" type="password" placeholder="Your password"><button class="pw-toggle" type="button" onclick="togglePW()">👁</button></div>
+        </div>
+        <button class="btn-primary" onclick="doLogin()">Sign in →</button>
+        <div class="or-divider"><div class="or-line"></div><span>or</span><div class="or-line"></div></div>
+        <button class="btn-secondary" onclick="show('s-role')">Create a new account</button>
+      </div>
+
+      <!-- SCREEN: PORTAL CHOOSER -->
+      <div class="screen" id="s-portal">
+        <h1 class="auth-title">Choose your portal</h1>
+        <p class="auth-sub">You have access to both talent and startup portals. Where would you like to go?</p>
+        <div class="portal-cards">
+          <a href="foundry-talent-dashboard.html" class="portal-card">
+            <span class="portal-card-icon">🚀</span>
+            <div class="portal-card-title">Talent Portal</div>
+            <div class="portal-card-desc">Browse jobs, track applications, manage your profile</div>
+          </a>
+          <a href="foundry-startup-portal.html" class="portal-card">
+            <span class="portal-card-icon">🏗️</span>
+            <div class="portal-card-title">Startup Portal</div>
+            <div class="portal-card-desc">Post roles, review applicants, manage your company</div>
+          </a>
+        </div>
+      </div>
+
+      <!-- SCREEN: FORGOT PASSWORD -->
+      <div class="screen" id="s-forgot">
+        <h1 class="auth-title">Reset your password</h1>
+        <p class="auth-sub">Enter your email and we'll send you a reset link.</p>
+        <div class="field"><label class="ds-label">Email</label><input class="ds-input" type="email" placeholder="you@company.com"></div>
+        <button class="btn-primary" onclick="doForgot()">Send reset link →</button>
+        <button class="btn-secondary" onclick="showLogin()">← Back to sign in</button>
+      </div>
+
+      <!-- SCREEN: FORGOT SUCCESS -->
+      <div class="screen" id="s-forgot-done">
+        <div class="success-icon">📧</div>
+        <h1 class="auth-title" style="text-align:center">Check your email</h1>
+        <p class="auth-sub" style="text-align:center">We sent a reset link to your email address. It expires in 15 minutes.</p>
+        <button class="btn-secondary" onclick="showLogin()">Back to sign in</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+let selectedRole = null;
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function showLogin() { show('s-login'); updateLeft('login'); }
+function showForgot() { show('s-forgot'); }
+function doForgot() { show('s-forgot-done'); }
+
+function selectRole(role) {
+  selectedRole = role;
+  document.getElementById('rc-talent').classList.toggle('selected', role === 'talent');
+  document.getElementById('rc-startup').classList.toggle('selected', role === 'startup');
+  checkStep1();
+  updateLeft(role);
+}
+
+const leftContent = {
+  talent: { headline: "Your next startup role is waiting.", sub: "AI-matched jobs at India's best startups. Salary and equity upfront. Free forever.", quote: '"I found my PM role at a Series B startup within 3 weeks. The AI match score told me exactly why I was right for it."', author: "Riya Menon · Senior PM, Kirana Club" },
+  startup: { headline: "Find builders who move fast.", sub: "Post a role, get AI-ranked applicants, and hire from 500k+ verified profiles.", quote: '"We filled our VP Engineering role in 11 days. The AI shortlist was better than 3 months of agency work."', author: "Aryan Shah · Co-founder, Kirana Club" },
+  login: { headline: "Welcome back.", sub: "Pick up where you left off. Your matches and applications are waiting.", quote: '"Foundry is the only platform where salary is shown upfront. That alone saves 2 weeks of wasted interviews."', author: "Sneha Rao · Head of Engineering" }
+};
+
+function updateLeft(type) {
+  const c = leftContent[type] || leftContent.talent;
+  document.getElementById('al-headline').textContent = c.headline;
+  document.getElementById('al-sub').textContent = c.sub;
+  document.getElementById('al-quote-text').textContent = '“' + c.quote.replace(/^"|"$/g,'') + '”';
+  document.getElementById('al-quote-author').textContent = c.author;
+}
+
+function checkStep1() {
+  const email = document.getElementById('email-1').value;
+  const ok = selectedRole && /\S+@\S+\.\S+/.test(email);
+  document.getElementById('btn-step1').disabled = !ok;
+}
+
+function goStep2() {
+  document.getElementById('company-field').style.display = selectedRole === 'startup' ? 'block' : 'none';
+  document.getElementById('s2-sub').textContent = selectedRole === 'startup' ? "Tell us about your company and set a password." : "Your name and a password — that's all.";
+  show('s-details');
+}
+
+function goSuccess() {
+  if (selectedRole === 'startup') {
+    document.getElementById('success-title').textContent = 'Company account created!';
+    document.getElementById('success-sub').textContent = 'Set up your company profile to start attracting talent.';
+    document.getElementById('success-cta').href = 'foundry-startup-portal.html';
+    document.getElementById('success-cta').textContent = 'Go to Startup Portal →';
+  }
+  show('s-success');
+}
+
+function checkPW(val) {
+  const bars = ['pb1','pb2','pb3','pb4'];
+  const label = document.getElementById('pw-label');
+  let strength = 0;
+  if (val.length >= 8) strength++;
+  if (/[A-Z]/.test(val)) strength++;
+  if (/[0-9]/.test(val)) strength++;
+  if (/[^A-Za-z0-9]/.test(val)) strength++;
+  const cls = strength <= 1 ? 'weak' : strength <= 2 ? 'ok' : 'strong';
+  const labels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+  bars.forEach((id, i) => {
+    const el = document.getElementById(id);
+    el.className = 'pw-bar' + (i < strength ? ' ' + cls : '');
+  });
+  label.textContent = val.length ? labels[strength] || 'Strong' : 'Enter a password';
+  label.style.color = cls === 'weak' ? 'var(--red)' : cls === 'ok' ? 'var(--amber,#B45309)' : 'var(--green)';
+}
+
+function togglePW() {
+  const inputs = document.querySelectorAll('.pw-wrap input');
+  inputs.forEach(i => i.type = i.type === 'password' ? 'text' : 'password');
+}
+
+function doLogin() {
+  const email = document.getElementById('login-email').value.toLowerCase();
+  if (email.includes('both')) { show('s-portal'); return; }
+  if (email.includes('startup')) { window.location.href = 'foundry-startup-portal.html'; return; }
+  window.location.href = 'foundry-talent-dashboard.html';
+}
+</script>
+</body>
+</html>

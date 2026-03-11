@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Browse Jobs — Foundry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --font:"DM Sans",-apple-system,sans-serif;
+  --bg:#FFFFFF;--bg-alt:#F8F9FA;--bg-ter:#F1F3F4;
+  --blue:#1A73E8;--blue-hov:#1557B0;--blue-tint:#E8F0FE;--blue-dark:#0D47A1;
+  --t-primary:#202124;--t-body:#3C4043;--t-muted:#5F6368;--t-faint:#80868B;--t-ghost:#BDC1C6;
+  --border:#DADCE0;--border-md:#E8EAED;
+  --green:#137333;--green-bg:#E6F4EA;
+  --red:#C5221F;--red-bg:#FCE8E6;
+  --amber:#B45309;--amber-bg:#FEF3C7;
+  --sh-sm:0 1px 4px rgba(0,0,0,.06);--sh-md:0 4px 16px rgba(0,0,0,.10);
+  --tr:200ms ease;--r-sm:4px;--r-md:6px;--r-lg:12px;--r-pill:100px;
+  --nav-h:56px;--filter-h:56px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px}
+body{font-family:var(--font);background:var(--bg);color:var(--t-body);-webkit-font-smoothing:antialiased;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+a{color:var(--blue);text-decoration:none}
+
+/* ── NAV ── */
+.topnav{height:var(--nav-h);background:var(--bg);border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;z-index:200}
+.tn-inner{width:100%;padding:0 20px;display:flex;align-items:center;gap:16px}
+.tn-logo{font-size:17px;font-weight:700;color:var(--t-primary);letter-spacing:-.03em}
+.tn-logo sup{font-size:9px;color:var(--blue);font-weight:600;vertical-align:super}
+.tn-links{display:flex;gap:18px}
+.tn-links a{font-size:13px;font-weight:500;color:var(--t-muted);transition:color var(--tr)}
+.tn-links a:hover,.tn-links a.active{color:var(--blue)}
+.tn-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;font-family:var(--font);font-size:13px;font-weight:500;border-radius:var(--r-md);cursor:pointer;transition:all var(--tr);text-decoration:none;white-space:nowrap;border:none;padding:7px 16px}
+.btn-p{background:var(--blue);color:#fff}
+.btn-p:hover{background:var(--blue-hov);color:#fff}
+.btn-s{background:transparent;color:var(--blue);border:1px solid var(--border)}
+.btn-s:hover{background:var(--bg-alt);border-color:var(--blue)}
+.btn-sm{padding:6px 13px;font-size:12px}
+.uav{width:32px;height:32px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;cursor:pointer;flex-shrink:0}
+
+/* ── FILTER BAR ── */
+.filter-bar{height:var(--filter-h);background:var(--bg);border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;gap:8px;padding:0 16px;overflow-x:auto}
+.filter-bar::-webkit-scrollbar{display:none}
+.search-wrap{position:relative;flex-shrink:0}
+.search-wrap input{height:36px;width:240px;background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--r-md);padding:0 12px 0 34px;font-family:var(--font);font-size:13px;color:var(--t-primary);outline:none;transition:all var(--tr)}
+.search-wrap input:focus{background:var(--bg);border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,115,232,.12);width:280px}
+.search-wrap input::placeholder{color:var(--t-ghost)}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;pointer-events:none;color:var(--t-faint)}
+.fb-sep{width:1px;height:24px;background:var(--border);flex-shrink:0;margin:0 4px}
+.fb-group{display:flex;gap:0;background:var(--bg-ter);border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;flex-shrink:0}
+.fb-chip{font-size:12px;font-weight:500;padding:6px 13px;cursor:pointer;color:var(--t-muted);background:transparent;border:none;font-family:var(--font);transition:all var(--tr);white-space:nowrap}
+.fb-chip:hover{color:var(--t-primary);background:var(--bg-alt)}
+.fb-chip.on{background:var(--bg);color:var(--blue);box-shadow:var(--sh-sm)}
+.fb-select{height:36px;background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--r-md);padding:0 10px;font-family:var(--font);font-size:12px;font-weight:500;color:var(--t-body);outline:none;cursor:pointer;transition:border-color var(--tr);flex-shrink:0}
+.fb-select:focus{border-color:var(--blue)}
+.fb-count{font-size:12px;color:var(--t-muted);white-space:nowrap;flex-shrink:0;margin-left:auto;padding-left:12px}
+.ai-match-toggle{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:var(--blue);background:var(--blue-tint);border:1px solid rgba(26,115,232,.2);border-radius:var(--r-pill);padding:5px 12px;cursor:pointer;flex-shrink:0;transition:all var(--tr)}
+.ai-match-toggle.off{background:var(--bg-ter);color:var(--t-muted);border-color:var(--border)}
+.amt-dot{width:6px;height:6px;border-radius:50%;background:var(--blue)}
+.ai-match-toggle.off .amt-dot{background:var(--t-ghost)}
+
+/* ── SPLIT PANE ── */
+.split-pane{display:flex;flex:1;overflow:hidden}
+
+/* LEFT: JOB LIST */
+.job-list{width:360px;flex-shrink:0;border-right:1px solid var(--border);overflow-y:auto;background:var(--bg-alt)}
+.job-list::-webkit-scrollbar{width:4px}
+.job-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.jl-header{padding:14px 16px 10px;position:sticky;top:0;background:var(--bg-alt);z-index:10;border-bottom:1px solid var(--border-md)}
+.jl-count{font-size:13px;font-weight:500;color:var(--t-primary)}
+.jl-sub{font-size:12px;color:var(--t-muted);margin-top:2px}
+.jl-body{padding:8px}
+
+/* JOB LIST CARD */
+.jlc{background:var(--bg);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px;margin-bottom:6px;cursor:pointer;transition:all var(--tr);border-left:3px solid transparent;position:relative}
+.jlc:hover{box-shadow:var(--sh-sm);border-color:var(--blue);border-left-color:var(--blue)}
+.jlc.active{border-color:var(--blue);border-left-color:var(--blue);box-shadow:var(--sh-md);background:var(--bg)}
+.jlc-top{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px}
+.jlc-logo{width:34px;height:34px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff}
+.jlc-title{font-size:13px;font-weight:500;color:var(--t-primary);line-height:1.3;margin-bottom:2px}
+.jlc-co{font-size:12px;color:var(--t-muted)}
+.jlc-match{position:absolute;top:12px;right:12px;font-size:11px;font-weight:600;padding:2px 7px;border-radius:var(--r-pill)}
+.jlc-match.high{background:var(--green-bg);color:var(--green)}
+.jlc-match.mid{background:var(--blue-tint);color:var(--blue)}
+.jlc-match.low{background:var(--bg-ter);color:var(--t-muted)}
+.jlc-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+.jlc-tag{font-size:11px;padding:2px 7px;border-radius:var(--r-pill);background:var(--bg-ter);color:var(--t-body)}
+.jlc-foot{display:flex;align-items:center;justify-content:space-between}
+.jlc-comp{font-size:12px;font-weight:500;color:var(--t-body)}
+.jlc-age{font-size:11px;color:var(--t-faint)}
+.jlc-saved{position:absolute;bottom:12px;right:12px;font-size:14px;cursor:pointer;opacity:.4;transition:opacity var(--tr)}
+.jlc-saved:hover,.jlc-saved.on{opacity:1}
+
+/* RIGHT: JD DETAIL */
+.jd-panel{flex:1;overflow-y:auto;background:var(--bg)}
+.jd-panel::-webkit-scrollbar{width:4px}
+.jd-panel::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.jd-inner{max-width:720px;padding:28px 32px 64px}
+
+/* JD HEADER */
+.jd-header{padding-bottom:22px;border-bottom:1px solid var(--border-md);margin-bottom:24px}
+.jd-top{display:flex;gap:16px;align-items:flex-start;margin-bottom:16px}
+.jd-logo{width:52px;height:52px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;border:1px solid rgba(0,0,0,.06)}
+.jd-title{font-size:22px;font-weight:600;color:var(--t-primary);letter-spacing:-.02em;margin-bottom:5px;line-height:1.2}
+.jd-co-link{font-size:14px;color:var(--blue);font-weight:500}
+.jd-co-link:hover{text-decoration:underline}
+.jd-meta-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.jd-meta-chip{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--t-muted);background:var(--bg-alt);border:1px solid var(--border-md);border-radius:var(--r-pill);padding:4px 11px}
+.jd-actions{display:flex;gap:8px;flex-wrap:wrap}
+.apply-btn{background:var(--blue);color:#fff;border:none;border-radius:var(--r-md);padding:11px 28px;font-family:var(--font);font-size:14px;font-weight:500;cursor:pointer;transition:all var(--tr);display:inline-flex;align-items:center;gap:6px}
+.apply-btn:hover{background:var(--blue-hov);box-shadow:0 2px 8px rgba(26,115,232,.3)}
+.apply-btn:disabled{background:var(--green);cursor:default}
+.save-btn{background:var(--bg);border:1px solid var(--border);border-radius:var(--r-md);padding:10px 16px;font-family:var(--font);font-size:14px;font-weight:500;color:var(--t-body);cursor:pointer;transition:all var(--tr)}
+.save-btn:hover{border-color:var(--blue);color:var(--blue)}
+.save-btn.saved{background:var(--bg-alt);color:var(--t-muted)}
+
+/* AI MATCH CARD */
+.ai-match-card{background:var(--blue-tint);border:1px solid rgba(26,115,232,.2);border-radius:var(--r-lg);padding:18px 20px;margin-bottom:22px;display:flex;gap:16px;align-items:flex-start}
+.amc-score-ring{width:56px;height:56px;flex-shrink:0;position:relative;display:flex;align-items:center;justify-content:center}
+.ring-svg{position:absolute;inset:0;transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:rgba(26,115,232,.15);stroke-width:4}
+.ring-fill{fill:none;stroke:var(--blue);stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset .8s cubic-bezier(.4,0,.2,1)}
+.ring-num{font-size:14px;font-weight:700;color:var(--blue);position:relative;z-index:1}
+.amc-body{flex:1}
+.amc-title{font-size:14px;font-weight:500;color:var(--t-primary);margin-bottom:6px}
+.amc-reasons{display:flex;flex-direction:column;gap:5px}
+.amc-reason{font-size:13px;color:var(--t-body);display:flex;align-items:flex-start;gap:6px;line-height:1.45}
+.amc-check{color:var(--green);font-size:13px;flex-shrink:0;margin-top:0}
+.amc-warn{color:var(--amber);font-size:13px;flex-shrink:0;margin-top:0}
+
+/* COMP STRIP */
+.comp-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-bottom:24px}
+.cs-item{background:var(--bg);padding:16px;text-align:center}
+.cs-val{font-size:16px;font-weight:600;color:var(--t-primary);margin-bottom:3px}
+.cs-lbl{font-size:11px;color:var(--t-muted)}
+
+/* JD BODY */
+.jd-section{margin-bottom:28px}
+.jds-title{font-size:15px;font-weight:500;color:var(--t-primary);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border-md)}
+.jd-desc p{font-size:14px;color:var(--t-body);line-height:1.75;margin-bottom:12px}
+.jd-list{list-style:none;display:flex;flex-direction:column;gap:8px}
+.jd-list li{font-size:14px;color:var(--t-body);line-height:1.6;display:flex;align-items:flex-start;gap:8px}
+.jd-list-dot{width:5px;height:5px;border-radius:50%;background:var(--blue);flex-shrink:0;margin-top:8px}
+.skill-cloud{display:flex;flex-wrap:wrap;gap:7px}
+.skill-chip{font-size:13px;font-weight:500;padding:5px 12px;border-radius:var(--r-pill);background:var(--bg-ter);color:var(--t-body);border:1px solid var(--border-md)}
+.skill-chip.match{background:var(--green-bg);color:var(--green);border-color:rgba(19,115,51,.2)}
+.skill-chip.partial{background:var(--blue-tint);color:var(--blue);border-color:rgba(26,115,232,.2)}
+
+/* COMPANY MINI CARD */
+.co-mini{background:var(--bg-alt);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;margin-bottom:24px;display:flex;gap:14px;align-items:flex-start}
+.cm-logo{width:44px;height:44px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:#fff}
+.cm-name{font-size:15px;font-weight:500;color:var(--t-primary);margin-bottom:4px}
+.cm-desc{font-size:13px;color:var(--t-muted);line-height:1.55;margin-bottom:8px}
+.cm-badges{display:flex;flex-wrap:wrap;gap:5px}
+.badge{display:inline-flex;align-items:center;font-size:11px;font-weight:500;padding:3px 8px;border-radius:var(--r-pill)}
+.bg{background:var(--green-bg);color:var(--green)}
+.bb{background:var(--blue-tint);color:var(--blue)}
+.bd{background:var(--bg-ter);color:var(--t-body)}
+
+/* SIMILAR JOBS */
+.similar-grid{display:flex;flex-direction:column;gap:8px}
+.sj-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px 16px;cursor:pointer;transition:all var(--tr);display:flex;gap:12px;align-items:center}
+.sj-card:hover{border-color:var(--blue);box-shadow:var(--sh-sm)}
+.sj-logo{width:32px;height:32px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff}
+.sj-title{font-size:13px;font-weight:500;color:var(--t-primary)}
+.sj-co{font-size:12px;color:var(--t-muted)}
+.sj-comp{font-size:12px;font-weight:500;color:var(--t-body);margin-left:auto;flex-shrink:0}
+
+/* APPLY MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:500;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg);border-radius:var(--r-lg);padding:32px;width:100%;max-width:500px;position:relative;animation:slideUp .25s ease;max-height:90vh;overflow-y:auto}
+@keyframes slideUp{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-close{position:absolute;top:14px;right:14px;background:none;border:none;font-size:18px;cursor:pointer;color:var(--t-muted);width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%}
+.modal-close:hover{background:var(--bg-ter)}
+.modal-title{font-size:20px;font-weight:500;color:var(--t-primary);margin-bottom:4px}
+.modal-sub{font-size:13px;color:var(--t-muted);margin-bottom:22px;line-height:1.5}
+.field{margin-bottom:15px}
+.ds-label{display:block;font-size:12px;font-weight:500;color:var(--t-muted);margin-bottom:5px}
+.ds-input{height:42px;width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-md);padding:0 13px;font-family:var(--font);font-size:14px;color:var(--t-primary);outline:none;transition:border-color var(--tr)}
+.ds-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,115,232,.12)}
+.success-state{display:none;text-align:center;padding:8px 0}
+.success-icon{width:56px;height:56px;background:var(--green-bg);border:2px solid rgba(19,115,51,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 14px;animation:popIn .4s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes popIn{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+
+/* EMPTY / LOADING */
+.empty-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px;text-align:center}
+.empty-icon{font-size:2.5rem;margin-bottom:12px}
+.empty-title{font-size:17px;font-weight:500;color:var(--t-primary);margin-bottom:6px}
+.empty-sub{font-size:14px;color:var(--t-muted)}
+
+@media(max-width:860px){
+  .job-list{width:300px}
+  .jd-inner{padding:20px 20px 48px}
+}
+@media(max-width:640px){
+  .job-list{width:100%;border-right:none;display:none}
+  .job-list.mobile-open{display:block;position:fixed;inset:0;top:calc(var(--nav-h)+var(--filter-h));z-index:100;overflow-y:auto}
+  .jd-panel{width:100%}
+  .tn-links{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="topnav">
+  <div class="tn-inner">
+    <a href="foundry-home.html" class="tn-logo">Foundry<sup>IN</sup></a>
+    <div class="tn-links">
+      <a href="foundry-role.html" class="active">Browse Jobs</a>
+      <a href="foundry-home.html">Browse Startups</a>
+      <a href="foundry-home.html">For Startups</a>
+    </div>
+    <div class="tn-right">
+      <a href="foundry-auth.html" class="btn btn-s btn-sm">Sign in</a>
+      <a href="foundry-auth.html" class="btn btn-p btn-sm">Post a role →</a>
+      <a href="foundry-talent-dashboard.html"><div class="uav">R</div></a>
+    </div>
+  </div>
+</nav>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="search-inp" placeholder="Search roles, skills, companies…" oninput="filterJobs()">
+  </div>
+  <div class="fb-sep"></div>
+  <div class="fb-group">
+    <button class="fb-chip on" onclick="filterType(this,'all')">All</button>
+    <button class="fb-chip" onclick="filterType(this,'product')">Product</button>
+    <button class="fb-chip" onclick="filterType(this,'engineering')">Engineering</button>
+    <button class="fb-chip" onclick="filterType(this,'growth')">Growth</button>
+    <button class="fb-chip" onclick="filterType(this,'design')">Design</button>
+    <button class="fb-chip" onclick="filterType(this,'data')">Data</button>
+  </div>
+  <div class="fb-sep"></div>
+  <select class="fb-select" onchange="filterJobs()" id="filter-location">
+    <option value="">📍 Any location</option>
+    <option value="bengaluru">Bengaluru</option>
+    <option value="mumbai">Mumbai</option>
+    <option value="delhi">Delhi NCR</option>
+    <option value="remote">Remote</option>
+    <option value="hybrid">Hybrid</option>
+  </select>
+  <select class="fb-select" onchange="filterJobs()" id="filter-stage">
+    <option value="">🚀 Any stage</option>
+    <option value="seed">Seed / Pre-seed</option>
+    <option value="series-a">Series A</option>
+    <option value="series-b">Series B</option>
+    <option value="series-c">Series C+</option>
+  </select>
+  <select class="fb-select" onchange="filterJobs()" id="filter-salary">
+    <option value="">₹ Any salary</option>
+    <option value="10">₹10L+</option>
+    <option value="20">₹20L+</option>
+    <option value="30">₹30L+</option>
+    <option value="50">₹50L+</option>
+  </select>
+  <button class="ai-match-toggle" id="ai-toggle" onclick="toggleAI()">
+    <span class="amt-dot"></span>AI Match
+  </button>
+  <span class="fb-count" id="job-count">Showing 12 roles</span>
+</div>
+
+<!-- SPLIT PANE -->
+<div class="split-pane">
+
+  <!-- JOB LIST -->
+  <div class="job-list" id="job-list">
+    <div class="jl-header">
+      <div class="jl-count" id="jl-count">12 roles</div>
+      <div class="jl-sub" id="jl-sub">Sorted by AI match score</div>
+    </div>
+    <div class="jl-body" id="jl-body">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+
+  <!-- JD DETAIL -->
+  <div class="jd-panel" id="jd-panel">
+    <div class="jd-inner" id="jd-inner">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+
+</div>
+
+<!-- APPLY MODAL -->
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modal-form">
+      <div class="modal-title">Apply — <span id="apply-title">Role</span></div>
+      <div class="modal-sub" id="apply-sub">Company · Location</div>
+      <div style="background:var(--green-bg);border:1px solid rgba(19,115,51,.2);border-radius:var(--r-md);padding:12px 14px;font-size:13px;color:var(--green);margin-bottom:18px;">
+        ✓ Your Foundry profile will be attached automatically. No cover letter needed.
+      </div>
+      <div class="field"><label class="ds-label">Confirm email</label><input class="ds-input" type="email" value="riya.menon@gmail.com"></div>
+      <div class="field"><label class="ds-label">Availability</label>
+        <select class="ds-input"><option>Available immediately</option><option>1 month notice</option><option>2 months notice</option><option>3 months notice</option></select>
+      </div>
+      <div class="field"><label class="ds-label">Anything to add? <span style="font-weight:400;color:var(--t-faint);">(optional)</span></label>
+        <textarea class="ds-input" rows="3" style="height:auto;padding:10px 13px;resize:vertical;line-height:1.6;" placeholder="A short note for the hiring team…"></textarea>
+      </div>
+      <button class="btn btn-p" style="width:100%;padding:12px;font-size:14px;" onclick="submitApply()">Submit application →</button>
+      <p style="font-size:12px;color:var(--t-faint);text-align:center;margin-top:10px;">Your AI match score and profile will be shared with the startup.</p>
+    </div>
+    <div class="success-state" id="modal-success">
+      <div class="success-icon">✓</div>
+      <div style="font-size:20px;font-weight:500;color:var(--t-primary);margin-bottom:8px;">Applied!</div>
+      <p style="font-size:14px;color:var(--t-muted);line-height:1.6;">Your application has been sent. Track its status in your <a href="foundry-talent-dashboard.html">dashboard</a>.</p>
+      <button class="btn btn-s" style="margin-top:20px;width:100%;" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────
+const JOBS = [
+  {
+    id:1,co:'Kirana Club',logo:'K',color:'#1A73E8',stage:'Series B',
+    title:'Senior Product Manager',type:'product',
+    location:'Bengaluru',work:'Hybrid',salary:'₹28–40L',equity:'0.1%',
+    match:96,age:'3 days ago',
+    tags:['Product Strategy','B2C','SQL','Roadmapping'],
+    desc:`<p>We're looking for a Senior PM to own the core merchant-side product — the dashboard, onboarding, and payments flows that 12 million kirana stores interact with daily.</p>
+<p>You'll work directly with the CPO, lead a squad of 2 engineers and 1 designer, and ship every week. This is a high-ownership, high-impact role at a company moving at genuine startup speed.</p>`,
+    responsibilities:[
+      'Own the merchant dashboard product end-to-end — strategy, roadmap, execution',
+      'Run weekly sprint reviews and fortnightly roadmap syncs with leadership',
+      'Define and track product KPIs; run A/B tests to improve activation and retention',
+      'Work closely with the field team to understand kirana owner pain points firsthand',
+      'Collaborate with data team to build self-serve analytics for merchants',
+    ],
+    requirements:[
+      '3+ years as a PM at a consumer or B2B product company',
+      'Strong SQL skills — you should be comfortable pulling your own data',
+      'Experience owning a product with 500k+ active users',
+      'MBA from a Tier 1 institution preferred but not required',
+      'Prior experience in commerce, fintech, or marketplace products a plus',
+    ],
+    skills:['Product Strategy','B2C','SQL','A/B Testing','Roadmapping','Figma','Data Analysis'],
+    matched_skills:['Product Strategy','B2C','SQL','A/B Testing','Roadmapping'],
+    partial_skills:['Figma'],
+    perks:['Health insurance (family)','ESOP + equity','Hybrid 3 days/week','₹50K learning budget'],
+    similar:[2,5,8],
+  },
+  {
+    id:2,co:'Setu',logo:'S',color:'#137333',stage:'Series B',
+    title:'Growth Lead',type:'growth',
+    location:'Remote',work:'Remote',salary:'₹22–32L',equity:'ESOP',
+    match:91,age:'1 week ago',
+    tags:['Growth','B2B SaaS','Analytics','CRM'],
+    desc:`<p>Setu builds India's financial data infrastructure — APIs that power bank account verification, credit bureau pulls, and investment data for 300+ companies.</p>
+<p>We need a Growth Lead to own the full funnel from awareness to activation for our developer-facing products.</p>`,
+    responsibilities:[
+      'Own MQL→SQL pipeline and optimise conversion at every stage',
+      'Build and run lifecycle email/in-app campaigns for developer activation',
+      'Work with product to identify and remove friction in the API trial experience',
+      'Manage SEO, content, and paid channels to drive qualified inbound',
+    ],
+    requirements:[
+      '4+ years in B2B growth or demand gen at a SaaS / fintech company',
+      'Strong analytical skills — comfortable with GA4, Amplitude, SQL',
+      'Experience with CRM tooling (HubSpot or Salesforce)',
+      'Understanding of API/developer products a significant plus',
+    ],
+    skills:['B2B Growth','SQL','Analytics','HubSpot','Content Marketing','SEO'],
+    matched_skills:['B2B Growth','SQL','Analytics'],
+    partial_skills:['HubSpot'],
+    perks:['Fully remote','ESOP','Health cover','Home office stipend'],
+    similar:[1,6,9],
+  },
+  {
+    id:3,co:'Zepto',logo:'Z',color:'#B45309',stage:'Series C',
+    title:'Head of Product',type:'product',
+    location:'Mumbai',work:'Hybrid',salary:'₹40–60L',equity:'0.15%',
+    match:88,age:'5 days ago',
+    tags:['Product Leadership','Quick Commerce','0→1'],
+    desc:`<p>Zepto is India's fastest 10-minute grocery delivery platform with ₹7,000 crore in ARR and growing 3× year-on-year. We're hiring a Head of Product to lead our consumer-facing app team.</p>`,
+    responsibilities:[
+      'Lead a team of 6 PMs across discovery, checkout, and post-order experiences',
+      'Drive the roadmap for the consumer app used by 5M+ monthly active users',
+      'Partner with the CEO and CMO on growth and retention strategy',
+      'Build a world-class product culture — hiring, mentoring, rituals',
+    ],
+    requirements:[
+      '6+ years of product experience, with at least 2 years managing PMs',
+      'Track record of shipping at scale (10M+ users)',
+      'Deep intuition for consumer behaviour and mobile UX',
+    ],
+    skills:['Product Leadership','Consumer Mobile','Team Management','Roadmapping','0→1'],
+    matched_skills:['Product Leadership','Roadmapping'],
+    partial_skills:['Consumer Mobile'],
+    perks:['ESOP at series C valuation','Relocation support','Top-of-market comp'],
+    similar:[1,4,7],
+  },
+  {
+    id:4,co:'Razorpay',logo:'R',color:'#5B21B6',stage:'Series F',
+    title:'Engineering Lead — Payments Core',type:'engineering',
+    location:'Bengaluru',work:'Hybrid',salary:'₹35–55L',equity:'ESOP',
+    match:82,age:'2 days ago',
+    tags:['Distributed Systems','Java','Payments','Tech Lead'],
+    desc:`<p>Razorpay processes ₹10L crore in payments annually. We're looking for an Engineering Lead for our payments core team — the team that ensures every transaction settles correctly.</p>`,
+    responsibilities:[
+      'Lead a team of 8 engineers across backend and infra',
+      'Own the reliability and scalability of the payment settlement engine',
+      'Drive architectural decisions and technical roadmap',
+      'Mentor engineers and run structured 1:1s',
+    ],
+    requirements:[
+      '6+ years of backend engineering, 2+ years in a lead role',
+      'Deep experience with distributed systems and high-throughput services',
+      'Strong Java / Kotlin background; Kafka and microservices experience preferred',
+    ],
+    skills:['Java','Distributed Systems','Kafka','Microservices','Tech Leadership'],
+    matched_skills:['Distributed Systems'],
+    partial_skills:['Java'],
+    perks:['ESOP at unicorn valuation','₹1L BYOD allowance','Comprehensive health cover'],
+    similar:[7,10,11],
+  },
+  {
+    id:5,co:'CRED',logo:'C',color:'#111827',stage:'Series E',
+    title:'Product Manager — Rewards',type:'product',
+    location:'Bengaluru',work:'On-site',salary:'₹20–30L',equity:'ESOP',
+    match:79,age:'1 week ago',
+    tags:['Rewards','Loyalty','B2C','Experimentation'],
+    desc:`<p>CRED's rewards system is one of India's most sophisticated loyalty programmes. We're looking for a PM to own the coins, cashback, and gamification layer.</p>`,
+    responsibilities:[
+      'Own the coins economy — earn rates, redemption flows, and gamification',
+      'Design and run large-scale A/B experiments on reward mechanics',
+      'Partner with data science to build predictive models for reward personalisation',
+    ],
+    requirements:[
+      '2–4 years as a PM in consumer or fintech',
+      'Strong quantitative background — you should be comfortable with stats',
+      'Prior experience with loyalty, gamification, or subscription products',
+    ],
+    skills:['Product Strategy','Loyalty','A/B Testing','SQL','Gamification'],
+    matched_skills:['Product Strategy','A/B Testing','SQL'],
+    partial_skills:['Loyalty'],
+    perks:['ESOP','Unlimited leave','World-class design culture','Top comp'],
+    similar:[1,2,6],
+  },
+  {
+    id:6,co:'BrowserStack',logo:'B',color:'#E11D48',stage:'Series B',
+    title:'Growth Marketing Manager',type:'growth',
+    location:'Mumbai',work:'Hybrid',salary:'₹16–24L',equity:'ESOP',
+    match:75,age:'4 days ago',
+    tags:['Performance Marketing','Developer Marketing','B2B SaaS'],
+    desc:`<p>BrowserStack is the world's leading software testing platform. We need a Growth Marketing Manager to run developer acquisition across paid and organic channels in India and APAC.</p>`,
+    responsibilities:[
+      'Manage ₹2Cr+ monthly paid media budget across Google, LinkedIn, and Reddit',
+      'Build content and SEO strategy targeting developer personas',
+      'Run lifecycle campaigns to convert free trials to paid seats',
+    ],
+    requirements:[
+      '3+ years in B2B growth or demand gen',
+      'Hands-on experience with Google Ads, LinkedIn Ads, and HubSpot',
+      'Understanding of developer audiences a strong plus',
+    ],
+    skills:['Performance Marketing','SEO','HubSpot','Google Ads','LinkedIn Ads'],
+    matched_skills:['Performance Marketing','SEO'],
+    partial_skills:[],
+    perks:['ESOP','Hybrid work','₹50K learning budget'],
+    similar:[2,9,12],
+  },
+  {
+    id:7,co:'PhonePe',logo:'P',color:'#5B21B6',stage:'Series E',
+    title:'Senior Software Engineer — Android',type:'engineering',
+    location:'Bengaluru',work:'Hybrid',salary:'₹22–35L',equity:'ESOP',
+    match:72,age:'3 days ago',
+    tags:['Android','Kotlin','Fintech','Mobile'],
+    desc:`<p>PhonePe serves 500M+ users. Our Android team builds the fastest, most reliable payments UX in India. Join us as a Senior SWE on the core app team.</p>`,
+    responsibilities:[
+      'Build and maintain critical features in the PhonePe Android app',
+      'Optimise app performance — startup time, memory, battery',
+      'Work with product and design to ship pixel-perfect UX',
+    ],
+    requirements:[
+      '3+ years of Android development with Kotlin',
+      'Experience building high-performance UIs at scale',
+      'Strong CS fundamentals',
+    ],
+    skills:['Kotlin','Android','Jetpack Compose','Performance Optimisation','Coroutines'],
+    matched_skills:['Kotlin','Android'],
+    partial_skills:[],
+    perks:['ESOP','Flexible hours','Health + wellness cover'],
+    similar:[4,10,11],
+  },
+  {
+    id:8,co:'Ola',logo:'O',color:'#2563EB',stage:'Series J',
+    title:'Product Manager — Driver Platform',type:'product',
+    location:'Bengaluru',work:'Hybrid',salary:'₹18–28L',equity:'ESOP',
+    match:68,age:'1 week ago',
+    tags:['Platform','Driver Experience','Growth','B2C'],
+    desc:`<p>Ola's driver platform serves 3M+ driver-partners across India. We're looking for a PM to own the driver-side earnings, incentives, and support experience.</p>`,
+    responsibilities:[
+      'Own driver earnings transparency — how drivers understand and optimise their income',
+      'Design incentive structures that balance supply with demand',
+      'Reduce support contact rate through self-serve tooling',
+    ],
+    requirements:[
+      '2–4 years as a PM on a marketplace or platform product',
+      'Data-driven mindset with strong SQL',
+      'Empathy for the driver persona — field visits are encouraged',
+    ],
+    skills:['Platform Products','SQL','Incentive Design','B2C','Marketplace'],
+    matched_skills:['B2C','SQL'],
+    partial_skills:['Platform Products'],
+    perks:['ESOP','Hybrid','Learning allowance'],
+    similar:[1,5,9],
+  },
+  {
+    id:9,co:'Swiggy',logo:'S',color:'#f97316',stage:'IPO',
+    title:'Senior Growth Manager',type:'growth',
+    location:'Bengaluru',work:'Hybrid',salary:'₹20–32L',equity:'ESOP',
+    match:65,age:'5 days ago',
+    tags:['Growth','Retention','CRM','B2C'],
+    desc:`<p>Swiggy is looking for a Senior Growth Manager to own the retention and reactivation vertical — building campaigns that bring lapsed users back and reduce churn.</p>`,
+    responsibilities:[
+      'Own retention KPIs for the core food delivery product',
+      'Build and optimise CRM campaigns across push, email, and in-app',
+      'Work with data science on churn prediction models',
+    ],
+    requirements:[
+      '4+ years in growth or CRM at a consumer internet company',
+      'Hands-on experience with MoEngage or CleverTap',
+      'Strong analytical skills',
+    ],
+    skills:['CRM','Retention','MoEngage','A/B Testing','SQL'],
+    matched_skills:['A/B Testing','SQL'],
+    partial_skills:['CRM'],
+    perks:['ESOP','Hybrid','Top comp','Free Swiggy One'],
+    similar:[2,6,12],
+  },
+  {
+    id:10,co:'Meesho',logo:'M',color:'#7C3AED',stage:'Series F',
+    title:'Backend Engineer — Catalogue',type:'engineering',
+    location:'Bengaluru',work:'Hybrid',salary:'₹18–28L',equity:'ESOP',
+    match:61,age:'2 weeks ago',
+    tags:['Python','Django','Elasticsearch','Backend'],
+    desc:`<p>Meesho's catalogue team manages 200M+ SKUs. We're looking for a backend engineer to build the indexing and search infrastructure that powers product discovery.</p>`,
+    responsibilities:[
+      'Build and maintain the catalogue ingestion and enrichment pipeline',
+      'Improve search relevance using Elasticsearch',
+      'Own reliability of catalogue APIs serving 50M+ users',
+    ],
+    requirements:[
+      '3+ years of backend development with Python or Go',
+      'Experience with Elasticsearch or similar search infrastructure',
+      'Familiarity with large-scale data pipelines',
+    ],
+    skills:['Python','Django','Elasticsearch','Kafka','PostgreSQL'],
+    matched_skills:['Python'],
+    partial_skills:['Elasticsearch'],
+    perks:['ESOP','Hybrid','Health cover'],
+    similar:[4,7,11],
+  },
+  {
+    id:11,co:'Dunzo',logo:'D',color:'#059669',stage:'Series D',
+    title:'Data Scientist — Demand Forecasting',type:'data',
+    location:'Bengaluru',work:'Hybrid',salary:'₹20–30L',equity:'ESOP',
+    match:58,age:'1 week ago',
+    tags:['ML','Time Series','Python','Forecasting'],
+    desc:`<p>Dunzo is rebuilding its demand forecasting stack. We need a Data Scientist to build and own the models that predict demand at the dark store level, reducing waste and improving fill rates.</p>`,
+    responsibilities:[
+      'Build time-series forecasting models for 200+ SKUs across 40+ dark stores',
+      'Own the forecasting pipeline end-to-end — data, model, deployment, monitoring',
+      'Collaborate with ops to translate model outputs into actionable inventory plans',
+    ],
+    requirements:[
+      '3+ years of applied ML with a focus on time-series or forecasting',
+      'Strong Python and SQL skills',
+      'MLflow or similar model management experience preferred',
+    ],
+    skills:['Python','Time Series','Machine Learning','SQL','MLflow'],
+    matched_skills:['Python','SQL'],
+    partial_skills:['Machine Learning'],
+    perks:['ESOP','Hybrid','Flexible hours'],
+    similar:[10,12,6],
+  },
+  {
+    id:12,co:'Urban Company',logo:'U',color:'#6366f1',stage:'Series F',
+    title:'Product Designer — Consumer',type:'design',
+    location:'Gurugram',work:'Hybrid',salary:'₹16–24L',equity:'ESOP',
+    match:54,age:'3 days ago',
+    tags:['Figma','Consumer UX','Mobile','Design Systems'],
+    desc:`<p>Urban Company is looking for a Product Designer to own the consumer-side booking and discovery experience on mobile. You'll work in a fast-moving pod of PM + eng + design.</p>`,
+    responsibilities:[
+      'Own end-to-end design for the service booking flow on iOS and Android',
+      'Build and maintain consumer-facing components in the design system',
+      'Run usability tests with real customers weekly',
+    ],
+    requirements:[
+      '3+ years of product design at a consumer mobile company',
+      'Strong Figma skills — prototyping, auto-layout, components',
+      'A portfolio showing shipped mobile products',
+    ],
+    skills:['Figma','Mobile UX','Design Systems','User Research','Prototyping'],
+    matched_skills:['Figma','User Research'],
+    partial_skills:['Mobile UX'],
+    perks:['ESOP','Hybrid','Creative freedom','Design-led culture'],
+    similar:[5,8,3],
+  },
+];
+
+// ── STATE ──────────────────────────────────────────────────────────────
+let activeId = 1;
+let activeType = 'all';
+let aiMatchOn = true;
+let savedJobs = new Set();
+let appliedJobs = new Set();
+
+// ── HELPERS ─────────────────────────────────────────────────────────
+function getFiltered() {
+  const q = document.getElementById('search-inp').value.toLowerCase();
+  const loc = document.getElementById('filter-location').value;
+  const stage = document.getElementById('filter-stage').value;
+  const sal = parseInt(document.getElementById('filter-salary').value) || 0;
+  return JOBS.filter(j => {
+    if (activeType !== 'all' && j.type !== activeType) return false;
+    if (q && !j.title.toLowerCase().includes(q) && !j.co.toLowerCase().includes(q) && !j.tags.some(t=>t.toLowerCase().includes(q))) return false;
+    if (loc) {
+      const l = loc.toLowerCase();
+      if (l === 'remote' && j.work.toLowerCase() !== 'remote') return false;
+      if (l === 'hybrid' && j.work.toLowerCase() !== 'hybrid') return false;
+      if (l !== 'remote' && l !== 'hybrid' && !j.location.toLowerCase().includes(l)) return false;
+    }
+    if (stage) {
+      const stageMap = {'seed':'Seed','series-a':'Series A','series-b':'Series B','series-c':'Series C'};
+      if (!j.stage.includes(stageMap[stage] || stage)) return false;
+    }
+    if (sal) {
+      const nums = j.salary.replace(/[^0-9–]/g,'').split('–').map(Number);
+      if (nums[0] < sal) return false;
+    }
+    return true;
+  }).sort((a,b) => aiMatchOn ? b.match - a.match : 0);
+}
+
+function matchColor(m) {
+  if (m >= 85) return 'high';
+  if (m >= 70) return 'mid';
+  return 'low';
+}
+
+function ring(pct) {
+  const r = 22; const circ = 2 * Math.PI * r;
+  const offset = circ - (pct/100)*circ;
+  return `<svg class="ring-svg" viewBox="0 0 56 56">
+    <circle class="ring-bg" cx="28" cy="28" r="${r}"/>
+    <circle class="ring-fill" cx="28" cy="28" r="${r}" stroke-dasharray="${circ}" stroke-dashoffset="${offset}" id="ring-dash"/>
+  </svg>`;
+}
+
+// ── RENDER LIST ────────────────────────────────────────────────────────
+function renderList() {
+  const jobs = getFiltered();
+  const body = document.getElementById('jl-body');
+  document.getElementById('jl-count').textContent = jobs.length + ' roles';
+  document.getElementById('jl-sub').textContent = aiMatchOn ? 'Sorted by AI match score' : 'Sorted by date posted';
+  document.getElementById('job-count').textContent = 'Showing ' + jobs.length + ' roles';
+
+  if (!jobs.length) {
+    body.innerHTML = '<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-title">No roles found</div><div class="empty-sub">Try adjusting your filters</div></div>';
+    document.getElementById('jd-inner').innerHTML = '<div class="empty-state"><div class="empty-icon">✦</div><div class="empty-title">No roles match your filters</div><div class="empty-sub">Clear a filter to see more options</div></div>';
+    return;
+  }
+
+  body.innerHTML = jobs.map(j => `
+    <div class="jlc ${j.id===activeId?'active':''}" id="jlc-${j.id}" onclick="selectJob(${j.id})">
+      <div class="jlc-top">
+        <div class="jlc-logo" style="background:${j.color};">${j.logo}</div>
+        <div style="flex:1;min-width:0;padding-right:36px;">
+          <div class="jlc-title">${j.title}</div>
+          <div class="jlc-co">${j.co} · ${j.location}</div>
+        </div>
+      </div>
+      ${aiMatchOn ? `<span class="jlc-match ${matchColor(j.match)}">${j.match}%</span>` : ''}
+      <div class="jlc-tags">${j.tags.slice(0,3).map(t=>`<span class="jlc-tag">${t}</span>`).join('')}</div>
+      <div class="jlc-foot">
+        <span class="jlc-comp">${j.salary}</span>
+        <span class="jlc-age">${j.age}</span>
+      </div>
+      <span class="jlc-saved ${savedJobs.has(j.id)?'on':''}" onclick="event.stopPropagation();toggleSave(${j.id},this)">
+        ${savedJobs.has(j.id)?'🔖':'🔖'}
+      </span>
+    </div>
+  `).join('');
+
+  // If active job is not in filtered list, select first
+  if (!jobs.find(j => j.id === activeId)) {
+    activeId = jobs[0].id;
+  }
+  renderDetail();
+}
+
+// ── RENDER DETAIL ─────────────────────────────────────────────────────
+function renderDetail() {
+  const j = JOBS.find(j => j.id === activeId);
+  if (!j) return;
+
+  // Highlight active card
+  document.querySelectorAll('.jlc').forEach(el => el.classList.remove('active'));
+  const card = document.getElementById('jlc-'+j.id);
+  if (card) { card.classList.add('active'); card.scrollIntoView({block:'nearest',behavior:'smooth'}); }
+
+  const applied = appliedJobs.has(j.id);
+  const saved = savedJobs.has(j.id);
+
+  const similarJobs = (j.similar||[]).map(id => JOBS.find(x=>x.id===id)).filter(Boolean).slice(0,3);
+
+  document.getElementById('jd-inner').innerHTML = `
+    <div class="jd-header">
+      <div class="jd-top">
+        <div class="jd-logo" style="background:${j.color};">${j.logo}</div>
+        <div style="flex:1">
+          <div class="jd-title">${j.title}</div>
+          <a href="foundry-startup-profile.html?from=jobs&role=${j.id===1?'pm':j.id===2?'eng':'growth'}" class="jd-co-link">${j.co} ↗</a>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
+          <span class="badge ${j.stage.includes('Series')?'bb':'bd'}">${j.stage}</span>
+          <span style="font-size:12px;color:var(--t-faint);">Posted ${j.age}</span>
+        </div>
+      </div>
+      <div class="jd-meta-row">
+        <span class="jd-meta-chip">📍 ${j.location}</span>
+        <span class="jd-meta-chip">🏠 ${j.work}</span>
+        <span class="jd-meta-chip">💰 ${j.salary}</span>
+        ${j.equity ? `<span class="jd-meta-chip">📈 ${j.equity} equity</span>` : ''}
+      </div>
+      <div class="jd-actions">
+        <button class="apply-btn" id="apply-btn-main" ${applied?'disabled':''} onclick="openApply(${j.id})">
+          ${applied ? '✓ Applied' : 'Apply now →'}
+        </button>
+        <button class="save-btn ${saved?'saved':''}" id="save-btn-main" onclick="toggleSave(${j.id},this,'main')">
+          ${saved ? '🔖 Saved' : '🔖 Save'}
+        </button>
+        <button class="save-btn" onclick="copyLink(this)">📋 Share</button>
+      </div>
+    </div>
+
+    ${aiMatchOn ? `
+    <div class="ai-match-card">
+      <div class="amc-score-ring">
+        ${ring(j.match)}
+        <span class="ring-num">${j.match}%</span>
+      </div>
+      <div class="amc-body">
+        <div class="amc-title">Your AI match score</div>
+        <div class="amc-reasons">
+          ${j.matched_skills.slice(0,3).map(s=>`<div class="amc-reason"><span class="amc-check">✓</span>${s} matches the job requirements</div>`).join('')}
+          ${j.partial_skills.slice(0,1).map(s=>`<div class="amc-reason"><span class="amc-warn">◐</span>${s} — partial match, but worth applying</div>`).join('')}
+        </div>
+      </div>
+    </div>` : ''}
+
+    <div class="comp-strip">
+      <div class="cs-item"><div class="cs-val">${j.salary}</div><div class="cs-lbl">Base salary</div></div>
+      <div class="cs-item"><div class="cs-val">${j.equity||'—'}</div><div class="cs-lbl">Equity</div></div>
+      <div class="cs-item"><div class="cs-val">${j.work}</div><div class="cs-lbl">Work type</div></div>
+    </div>
+
+    <div class="jd-section">
+      <div class="jds-title">About the role</div>
+      <div class="jd-desc">${j.desc}</div>
+    </div>
+
+    <div class="jd-section">
+      <div class="jds-title">What you'll do</div>
+      <ul class="jd-list">${j.responsibilities.map(r=>`<li><span class="jd-list-dot"></span>${r}</li>`).join('')}</ul>
+    </div>
+
+    <div class="jd-section">
+      <div class="jds-title">What we're looking for</div>
+      <ul class="jd-list">${j.requirements.map(r=>`<li><span class="jd-list-dot"></span>${r}</li>`).join('')}</ul>
+    </div>
+
+    <div class="jd-section">
+      <div class="jds-title">Skills</div>
+      <div class="skill-cloud">
+        ${j.skills.map(s => `<span class="skill-chip ${j.matched_skills.includes(s)?'match':j.partial_skills.includes(s)?'partial':''}">${s}</span>`).join('')}
+      </div>
+      ${aiMatchOn ? '<p style="font-size:12px;color:var(--t-muted);margin-top:10px;"><span style="color:var(--green)">■</span> You have this &nbsp; <span style="color:var(--blue)">■</span> Partial match &nbsp; ■ Not yet</p>' : ''}
+    </div>
+
+    <div class="jd-section">
+      <div class="jds-title">Perks & benefits</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        ${j.perks.map(p=>`<span style="font-size:13px;padding:5px 12px;border-radius:var(--r-pill);background:var(--bg-alt);border:1px solid var(--border-md);color:var(--t-body);">✦ ${p}</span>`).join('')}
+      </div>
+    </div>
+
+    <div class="jd-section">
+      <div class="jds-title">About ${j.co}</div>
+      <div class="co-mini">
+        <div class="cm-logo" style="background:${j.color};">${j.logo}</div>
+        <div>
+          <div class="cm-name">${j.co}</div>
+          <div class="cm-desc">${j.location} · ${j.stage} · ${j.type === 'engineering' ? 'Tech' : 'Product & Growth'}</div>
+          <div class="cm-badges">
+            <span class="badge bg">✓ Verified</span>
+            <span class="badge bb">${j.stage}</span>
+          </div>
+        </div>
+        <a href="foundry-startup-profile.html?from=jobs&role=${j.id===1?'pm':j.id===2?'eng':'growth'}" class="btn btn-s btn-sm" style="margin-left:auto;flex-shrink:0;">View company ↗</a>
+      </div>
+    </div>
+
+    ${similarJobs.length ? `
+    <div class="jd-section">
+      <div class="jds-title">Similar roles</div>
+      <div class="similar-grid">
+        ${similarJobs.map(s=>`
+          <div class="sj-card" onclick="selectJob(${s.id})">
+            <div class="sj-logo" style="background:${s.color};">${s.logo}</div>
+            <div><div class="sj-title">${s.title}</div><div class="sj-co">${s.co} · ${s.location}</div></div>
+            <div class="sj-comp">${s.salary}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>` : ''}
+
+    <div style="margin-top:32px;padding-top:24px;border-top:1px solid var(--border-md);display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <button class="apply-btn" ${applied?'disabled':''} onclick="openApply(${j.id})">
+        ${applied ? '✓ Applied' : 'Apply now →'}
+      </button>
+      <button class="save-btn ${saved?'saved':''}" onclick="toggleSave(${j.id},this,'bottom')">
+        ${saved ? '🔖 Saved' : '🔖 Save role'}
+      </button>
+    </div>
+  `;
+
+  // Scroll detail panel to top
+  document.getElementById('jd-panel').scrollTop = 0;
+}
+
+// ── INTERACTIONS ────────────────────────────────────────────────────
+function selectJob(id) {
+  activeId = id;
+  renderDetail();
+}
+
+function filterType(el, type) {
+  el.closest('.fb-group').querySelectorAll('.fb-chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  activeType = type;
+  filterJobs();
+}
+
+function filterJobs() {
+  renderList();
+}
+
+function toggleAI() {
+  aiMatchOn = !aiMatchOn;
+  const btn = document.getElementById('ai-toggle');
+  btn.classList.toggle('off', !aiMatchOn);
+  btn.querySelector('.amt-dot').style.background = aiMatchOn ? 'var(--blue)' : 'var(--t-ghost)';
+  renderList();
+}
+
+function toggleSave(id, el, ctx) {
+  savedJobs.has(id) ? savedJobs.delete(id) : savedJobs.add(id);
+  const saved = savedJobs.has(id);
+  // update list card icon
+  const listCard = document.getElementById('jlc-'+id);
+  if (listCard) {
+    const icon = listCard.querySelector('.jlc-saved');
+    if (icon) icon.classList.toggle('on', saved);
+  }
+  // update main / bottom buttons if in detail view
+  if (ctx === 'main' || ctx === 'bottom') renderDetail();
+}
+
+function openApply(id) {
+  const j = JOBS.find(x => x.id === id);
+  document.getElementById('apply-title').textContent = j.title;
+  document.getElementById('apply-sub').textContent = `${j.co} · ${j.location} · ${j.salary}`;
+  document.getElementById('modal-form').style.display = 'block';
+  document.getElementById('modal-success').style.display = 'none';
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  // store pending apply job
+  document.getElementById('modal').dataset.jobId = id;
+}
+
+function submitApply() {
+  const id = parseInt(document.getElementById('modal').dataset.jobId);
+  appliedJobs.add(id);
+  document.getElementById('modal-form').style.display = 'none';
+  document.getElementById('modal-success').style.display = 'block';
+  renderDetail();
+}
+
+function closeModal(e) {
+  if (e && e.target !== document.getElementById('modal')) return;
+  document.getElementById('modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function copyLink(btn) {
+  navigator.clipboard.writeText(window.location.href).catch(() => {});
+  const orig = btn.textContent; btn.textContent = '✓ Copied';
+  setTimeout(() => btn.textContent = orig, 2000);
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal({ target: document.getElementById('modal') });
+  if (e.key === 'ArrowDown' || e.key === 'j') {
+    const jobs = getFiltered();
+    const idx = jobs.findIndex(j => j.id === activeId);
+    if (idx < jobs.length - 1) selectJob(jobs[idx + 1].id);
+  }
+  if (e.key === 'ArrowUp' || e.key === 'k') {
+    const jobs = getFiltered();
+    const idx = jobs.findIndex(j => j.id === activeId);
+    if (idx > 0) selectJob(jobs[idx - 1].id);
+  }
+});
+
+// ── INIT ──────────────────────────────────────────────────────────────
+// Support ?job=N to pre-select a specific job (e.g. from startup profile)
+const urlParams = new URLSearchParams(window.location.search);
+const preSelectJob = parseInt(urlParams.get('job'));
+if (preSelectJob && JOBS.find(j => j.id === preSelectJob)) {
+  activeId = preSelectJob;
+}
+renderList();
+</script>
+</body>
+</html>
