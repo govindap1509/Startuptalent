@@ -19,7 +19,7 @@ create table public.talent_profiles (
   headline text,
   bio text,
   avatar_url text,
-  current_role text,
+  current_job_title text,
   current_company text,
   years_of_experience integer default 0,
   target_roles text[] default '{}',
